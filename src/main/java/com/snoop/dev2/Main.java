@@ -17,8 +17,8 @@ public class Main {
 
 			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 			Project pom = (Project) jaxbUnmarshaller.unmarshal(file);
-			System.out.println(pom.getVersion());
-
+			System.out.println(pom.version);
+			
 		  } catch (JAXBException e) {
 			e.printStackTrace();
 		  }
