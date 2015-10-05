@@ -47,6 +47,8 @@ public class WorkerPom {
 				+ Integer.toString(dia) + " " + Integer.toString(hora) + "-" + Integer.toString(minuto) + "-"
 				+ Integer.toString(segundo) + "pom.xml");
 		inFIle.renameTo(backupFile);
+		System.out.println(inFIle.getAbsolutePath());
+		outFile.renameTo(inFIle);
 	}
 
 	public void leerPOM() {
@@ -58,13 +60,12 @@ public class WorkerPom {
 			if (this.pom == null)
 				System.out.println("el pom es nulo");
 			// Aca tengo que llamar a modificar los distintos poms
-			
-			if(pom.getModules().getModule()!= null){
-				for (String hola : pom.getModules().getModule()) {
-					new WorkerPom(this.nuevaVersion, newBranch, this.path+hola+"/" );
-				}
-			}
-
+			// if (pom.getModules().getModule() != null) {
+			// for (String hola : pom.getModules().getModule()) {
+			// new WorkerPom(this.nuevaVersion, newBranch, this.path + hola +
+			// "/");
+			// }
+			// }
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		}
@@ -84,7 +85,7 @@ public class WorkerPom {
 			br2 = new BufferedReader(fr);
 			String cadena = br2.readLine();
 			while (cadena != null) {
-				cadenaInArchivoXML += cadena;
+				cadenaInArchivoXML += cadena + "<<<<";
 				cadena = br2.readLine();
 			}
 		} catch (IOException e) {
@@ -100,10 +101,14 @@ public class WorkerPom {
 		;
 		// reemplazo la version que tengo al momento de ejecutar el ejecutable
 		cadenaInArchivoXML = cadenaInArchivoXML.replace(oldPomVersion, nuevaVersion);
+		String[] cadena = cadenaInArchivoXML.split("<<<<");
 		try {
 			fw = new FileWriter(outFile);
 			bw = new BufferedWriter(fw);
-			bw.write(cadenaInArchivoXML);
+			for (String hola : cadena) {
+				bw.write(hola);
+				bw.newLine();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {

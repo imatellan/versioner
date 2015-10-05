@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import javax.swing.text.AbstractDocument.BranchElement;
+
 public class Main {
 
 	private static String nuevaVersion;
@@ -14,8 +16,14 @@ public class Main {
 	public static void main(String[] args) {
 		pedirNuevaVersion();
 		obtenerPath();
-		newBranch = executeCommand("git rev-parse --abbrev-ref HEAD");
+		pedirNuevoBranch();
+
+		// CON EL -C podes pasar a otro directorio sin hacer cd. Le indicas
+		// sobre que directorio necesitas que trabaje
+		// Creo el nuevo branch
+		executeCommand("git -C " + path + " checkout -b " + newBranch);
 		new WorkerPom(nuevaVersion, newBranch, path);
+//		commitBranchToGit()
 	}
 
 	// Este metodo ejecuta comandos en consola.
@@ -65,4 +73,22 @@ public class Main {
 			e.printStackTrace();
 		}
 	}
+
+	// pido y debería validar ciertas cosas del nuevo branch
+	public static void pedirNuevoBranch() {
+		do {
+			System.out.println("Ingrese el nuevo branch a crear. Este nombre, no debe contener espacios ni puntos: ");
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			try {
+				Main.newBranch = br.readLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			// pregunto si al splitear con . tengo menos de dos campos.
+		} while (newBranch.split(".").length < 2);
+	}
+
+//	public void commitBranchToGit() {
+//
+//	}
 }
