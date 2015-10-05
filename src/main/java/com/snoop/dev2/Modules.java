@@ -14,7 +14,7 @@ public class Modules {
 		module = new ArrayList<String>();
 	}
 
-	public  ArrayList<String> getModule() {
+	public ArrayList<String> getModule() {
 		return module;
 	}
 

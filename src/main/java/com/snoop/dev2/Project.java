@@ -1,7 +1,5 @@
 package com.snoop.dev2;
 
-import java.util.ArrayList;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -12,7 +10,7 @@ public class Project {
 	String groupId;
 	String artifactId;
 	String version;
-	Modules modules=new Modules();
+	Modules modules = new Modules();
 
 	public String getModelVersion() {
 		return modelVersion;
