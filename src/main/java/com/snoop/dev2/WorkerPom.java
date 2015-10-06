@@ -38,6 +38,14 @@ public class WorkerPom {
 			modificarPom(this.pom.version);
 			intercambiarNombre();
 		}
+		// Aca tengo que llamar a modificar los distintos poms
+		if (this.pom.getModules().getModule() != null) {
+			for (String module : this.pom.getModules().getModule()) {
+				if(!module.contains("/")){
+					new WorkerPom(this.newVersion, this.path + module +"/");
+				}
+			}
+		}
 	}
 	
 	private boolean validatePom() {
@@ -58,15 +66,6 @@ public class WorkerPom {
 			this.pom = (POM) jaxbUnmarshaller.unmarshal(inFile);
 			if (this.pom == null)
 				System.out.println("el pom es nulo");
-			
-			// Aca tengo que llamar a modificar los distintos poms
-			if (this.pom.getModules().getModule() != null) {
-				for (String module : this.pom.getModules().getModule()) {
-					if(!module.contains("/")){
-						new WorkerPom(this.newVersion, this.path + module +"/");
-					}
-				}
-			}
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		}
