@@ -3,27 +3,75 @@ package com.snoop.dev2;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
-import javax.swing.text.AbstractDocument.BranchElement;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Main {
 
-	private static String nuevaVersion;
-	private static String path;
+	private static String newVersion;
 	private static String newBranch;
-
+	private static String path;
+	private static String primaryVersion;
+	
 	// METODO PRINCIPAL
 	public static void main(String[] args) {
-		pedirNuevaVersion();
-		obtenerPath();
-		pedirNuevoBranch();
-
+		getNewVersion();
+		getNewBranch();
+		getPath();
+		
+		
 		// CON EL -C podes pasar a otro directorio sin hacer cd. Le indicas
 		// sobre que directorio necesitas que trabaje
 		// Creo el nuevo branch
 		executeCommand("git -C " + path + " checkout -b " + newBranch);
-		new WorkerPom(nuevaVersion, newBranch, path);
+		newVersion = primaryVersion+"."+newVersion+"."+newBranch.substring(0, newBranch.length()) + "-SNAPSHOT";
+			new WorkerPom(newVersion, path);
 //		commitBranchToGit()
+	}
+
+	public static void getNewVersion() {
+		System.out.println("Ingrese la nueva Version que se creara\n");
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		try {
+			Main.newVersion = br.readLine();
+		} catch (IOException e) {
+
+		}
+	}
+	
+	// pido y debería validar ciertas cosas del nuevo branch
+	public static void getNewBranch() {
+		Matcher m;
+		do {
+			System.out.println("Ingrese el nuevo branch a crear. (Este nombre solo acepta Alphanumerics y _ [underscore]): \n");
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			try {
+				Main.newBranch = br.readLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			Pattern r = Pattern.compile("^[a-zA-Z0-9_]*$");
+			m = r.matcher(Main.newBranch);
+			
+			// pregunto si al splitear con . tengo menos de dos campos.
+		} while (!m.matches() || Main.newBranch.isEmpty());
+	}
+	
+	public static void getPath() {
+		System.out.println("Ingrese el path en donde ejecutar este proceso\n");
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		try {
+			Main.path = br.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		modifyPath();
+	}
+	
+	public static void modifyPath() {
+		if (Main.path.charAt(Main.path.length() - 1) != '/') {
+			Main.path += "/";
+		}
 	}
 
 	// Este metodo ejecuta comandos en consola.
@@ -44,50 +92,7 @@ public class Main {
 		}
 		return output.toString();
 	}
-
-	public static void obtenerPath() {
-		pedirPathEnDondeEjecutar();
-		if (path.charAt(path.length() - 1) != '/') {
-			path += "/";
-		}
-	}
-
-	public static void pedirNuevaVersion() {
-		System.out.println("Ingrese la nueva Version que se creara");
-		System.out.println();
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		try {
-			Main.nuevaVersion = br.readLine();
-		} catch (IOException e) {
-
-		}
-	}
-
-	public static void pedirPathEnDondeEjecutar() {
-		System.out.println("Ingrese el path en donde ejecutar este proceso");
-		System.out.println();
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		try {
-			Main.path = br.readLine();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	// pido y debería validar ciertas cosas del nuevo branch
-	public static void pedirNuevoBranch() {
-		do {
-			System.out.println("Ingrese el nuevo branch a crear. Este nombre, no debe contener espacios ni puntos: ");
-			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-			try {
-				Main.newBranch = br.readLine();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			// pregunto si al splitear con . tengo menos de dos campos.
-		} while (newBranch.split(".").length < 2);
-	}
-
+	
 //	public void commitBranchToGit() {
 //
 //	}
