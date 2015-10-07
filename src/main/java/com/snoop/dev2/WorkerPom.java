@@ -41,6 +41,7 @@ public class WorkerPom {
 			backUpFile();
 		}
 		// Aca tengo que llamar a modificar los distintos poms
+		
 		if (this.pom.getModules().getModule() != null) {
 			for (String module : this.pom.getModules().getModule()) {
 				if(!module.contains("/")){
