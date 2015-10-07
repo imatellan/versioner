@@ -11,7 +11,7 @@ public class Main {
 	private static String newVersion;
 	private static String newBranch;
 	private static String path;
-	private static String primaryVersion;
+	public static String primaryVersion = null;
 	
 	// METODO PRINCIPAL
 	public static void main(String[] args) {
@@ -24,19 +24,24 @@ public class Main {
 		// sobre que directorio necesitas que trabaje
 		// Creo el nuevo branch
 		executeCommand("git -C " + path + " checkout -b " + newBranch);
-		newVersion = primaryVersion+"."+newVersion+"."+newBranch.substring(0, newBranch.length()) + "-SNAPSHOT";
+		newVersion = primaryVersion+"."+newVersion+"."+newBranch+ "-SNAPSHOT";
 			new WorkerPom(newVersion, path);
 //		commitBranchToGit()
 	}
 
 	public static void getNewVersion() {
-		System.out.println("Ingrese la nueva Version que se creara\n");
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		try {
-			Main.newVersion = br.readLine();
-		} catch (IOException e) {
-
-		}
+		Matcher m;
+		do{
+			System.out.println("Ingrese la nueva Version que se creará. (Solo Números): \n");
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			try {
+				Main.newVersion = br.readLine();
+			} catch (IOException e) {
+	
+			}
+			Pattern r = Pattern.compile("\\d+");
+			m = r.matcher(Main.newVersion);
+		} while (!m.matches());
 	}
 	
 	// pido y debería validar ciertas cosas del nuevo branch

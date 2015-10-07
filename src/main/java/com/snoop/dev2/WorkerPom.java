@@ -36,6 +36,8 @@ public class WorkerPom {
 		}
 		//Asigna un objeto POM a "this.pom"
 		parsePOMtoObject();
+//		ACA EMPEZE A TOCAR
+		Main.primaryVersion;
 		if(this.validatePom()){
 			modifyPom(this.pom.version);
 			backUpFile();
@@ -45,11 +47,7 @@ public class WorkerPom {
 		if (this.pom.getModules().getModule() != null) {
 			for (String module : this.pom.getModules().getModule()) {
 				if(!module.contains("/")){
-					this.path = this.path + module +"/";
-					parsePOMtoObject();
-					modifyPom(this.pom.version);
-					backUpFile();
-					this.path.replace(module, "");
+					new WorkerPom(newVersion, this.path + module +"/");
 				}
 			}
 		}
@@ -158,7 +156,6 @@ public class WorkerPom {
 				+ Integer.toString(dia) + " " + Integer.toString(hora) + ":" + Integer.toString(minuto) + ":"
 				+ Integer.toString(segundo) + " pom.xml");
 		inFile.renameTo(backupFile);
-		System.out.println(inFile.getAbsolutePath());
 		outFile.renameTo(inFile);
 	}
 }
