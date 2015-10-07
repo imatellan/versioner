@@ -3,7 +3,7 @@ package com.snoop.dev2;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "Project")
+@XmlRootElement(name = "project")
 public class POM {
 
 	String modelVersion;

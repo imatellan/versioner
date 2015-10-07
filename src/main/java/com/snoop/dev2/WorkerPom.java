@@ -1,13 +1,15 @@
 package com.snoop.dev2;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 public class WorkerPom {
@@ -35,14 +37,18 @@ public class WorkerPom {
 		//Asigna un objeto POM a "this.pom"
 		parsePOMtoObject();
 		if(this.validatePom()){
-			modificarPom(this.pom.version);
-			intercambiarNombre();
+			modifyPom(this.pom.version);
+			backUpFile();
 		}
 		// Aca tengo que llamar a modificar los distintos poms
 		if (this.pom.getModules().getModule() != null) {
 			for (String module : this.pom.getModules().getModule()) {
 				if(!module.contains("/")){
-					new WorkerPom(this.newVersion, this.path + module +"/");
+					this.path = this.path + module +"/";
+					parsePOMtoObject();
+					modifyPom(this.pom.version);
+					backUpFile();
+					this.path.replace(module, "");
 				}
 			}
 		}
@@ -62,6 +68,7 @@ public class WorkerPom {
 	public void parsePOMtoObject() {
 		try {
 			context = JAXBContext.newInstance(POM.class);
+			System.out.println(inFile.getAbsolutePath());
 			Unmarshaller jaxbUnmarshaller = context.createUnmarshaller();
 			this.pom = (POM) jaxbUnmarshaller.unmarshal(inFile);
 			if (this.pom == null)
@@ -71,26 +78,74 @@ public class WorkerPom {
 		}
 	}
 
-	public void modificarPom(String oldPomVersion) {
+	public void modifyPom(String oldPomVersion) {
 
-		 Marshaller marshaller;
-		 pom.setVersion(newVersion);
-		 FileWriter writer = null;
-		 try {
-		 writer = new FileWriter(outFile);
-		 } catch (IOException e) {
-		 e.printStackTrace();
-		 }
-		 try {
-		 marshaller = context.createMarshaller();
-		 marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-		 marshaller.marshal(pom, writer);
-		 } catch (JAXBException e1) {
-		 e1.printStackTrace();
-		 }
+		FileWriter fw = null;
+		BufferedWriter bw = null;
+		BufferedReader br2 = null;
+		FileReader fr = null;
+		String cadenaInArchivoXML = "";
+		try {
+			// Abro el archivo y comienzo a leer, dejo todo en la variable
+			// cadena "<<<<" es una serie de caracteres para poder parsear
+			// y comenzar a escribir nuevamente el archivo
+			fr = new FileReader(inFile);
+			br2 = new BufferedReader(fr);
+			String cadena = br2.readLine();
+			while (cadena != null) {
+				cadenaInArchivoXML += cadena + "<<<<";
+				cadena = br2.readLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				br2.close();
+				fr.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		;
+		// reemplazo la version que tengo al momento de ejecutar el ejecutable
+		cadenaInArchivoXML = cadenaInArchivoXML.replace(oldPomVersion, newVersion);
+		String[] cadena = cadenaInArchivoXML.split("<<<<");
+		try {
+			fw = new FileWriter(outFile);
+			bw = new BufferedWriter(fw);
+			for (String line : cadena) {
+				bw.write(line);
+				bw.newLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				bw.close();
+				fw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+//		 Marshaller marshaller;
+//		 pom.setVersion(newVersion);
+//		 FileWriter writer = null;
+//		 try {
+//		 writer = new FileWriter(outFile);
+//		 } catch (IOException e) {
+//		 e.printStackTrace();
+//		 }
+//		 try {
+//		 marshaller = context.createMarshaller();
+//		 marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+//		 marshaller.marshal(pom, writer);
+//		 marshaller.marshal(pom, System.out);
+//		 } catch (JAXBException e1) {
+//		 e1.printStackTrace();
+//		 }
 	}
 	
-	private void intercambiarNombre() {
+	private void backUpFile() {
 		Calendar fecha = Calendar.getInstance();
 		int anio = fecha.get(Calendar.YEAR);
 		int mes = fecha.get(Calendar.MONTH) + 1;
@@ -107,53 +162,7 @@ public class WorkerPom {
 	}
 }
 
-//FileWriter fw = null;
-//BufferedWriter bw = null;
-//BufferedReader br2 = null;
-//FileReader fr = null;
-//String cadenaInArchivoXML = "";
-//try {
-//	// Abro el archivo y comienzo a leer, dejo todo en la variable
-//	// cadena "<<<<" es una serie de caracteres para poder parsear
-//	// y comenzar a escribir nuevamente el archivo
-//	fr = new FileReader(inFile);
-//	br2 = new BufferedReader(fr);
-//	String cadena = br2.readLine();
-//	while (cadena != null) {
-//		cadenaInArchivoXML += cadena + "<<<<";
-//		cadena = br2.readLine();
-//	}
-//} catch (IOException e) {
-//	e.printStackTrace();
-//} finally {
-//	try {
-//		br2.close();
-//		fr.close();
-//	} catch (IOException e) {
-//		e.printStackTrace();
-//	}
-//}
-//;
-//// reemplazo la version que tengo al momento de ejecutar el ejecutable
-//cadenaInArchivoXML = cadenaInArchivoXML.replace(oldPomVersion, newVersion);
-//String[] cadena = cadenaInArchivoXML.split("<<<<");
-//try {
-//	fw = new FileWriter(outFile);
-//	bw = new BufferedWriter(fw);
-//	for (String hola : cadena) {
-//		bw.write(hola);
-//		bw.newLine();
-//	}
-//} catch (IOException e) {
-//	e.printStackTrace();
-//} finally {
-//	try {
-//		bw.close();
-//		fw.close();
-//	} catch (IOException e) {
-//		e.printStackTrace();
-//	}
-//}
+
 
 	 
 	
