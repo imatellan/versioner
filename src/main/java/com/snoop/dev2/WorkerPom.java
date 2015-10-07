@@ -36,6 +36,8 @@ public class WorkerPom {
 		}
 		//Asigna un objeto POM a "this.pom"
 		parsePOMtoObject();
+//		ACA EMPEZE A TOCAR
+		Main.primaryVersion;
 		if(this.validatePom()){
 			modifyPom(this.pom.version);
 			backUpFile();

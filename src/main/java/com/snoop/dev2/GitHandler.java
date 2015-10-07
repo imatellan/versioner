@@ -40,6 +40,7 @@ public class GitHandler {
 	}
 
 	private static void executeCommand(String command) {
+		@SuppressWarnings("unused")
 		Process p;
 		try {
 			// Ejecuta el comando
